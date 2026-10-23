@@ -1,0 +1,6 @@
+projectKey=redtutor
+serverUrl=http://localhost:9000
+serverVersion=26.10.0.133078
+dashboardUrl=http://localhost:9000/dashboard?id=redtutor
+ceTaskId=687bffad-a16c-4749-a992-ff14cdfa4d7d
+ceTaskUrl=http://localhost:9000/api/ce/task?id=687bffad-a16c-4749-a992-ff14cdfa4d7d

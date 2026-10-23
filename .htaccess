@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Evita bucles y redirige todas las rutas de la aplicación a public/index.php
+RewriteCond %{REQUEST_URI} !^/redtutor/public/ [NC]
+RewriteRule ^(.*)$ public/index.php [L]
+
+# Ruta raíz de la app
+RewriteRule ^$ public/index.php [L]
