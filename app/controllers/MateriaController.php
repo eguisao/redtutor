@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\MateriaModel;
+use App\Services\MateriaEventLogger;
+use Throwable;
 
 class MateriaController
 {
@@ -97,27 +99,56 @@ class MateriaController
             exit;
         }
 
-        if ($action === 'create') {
-            $created = MateriaModel::create([
+        
+   
+if ($action === 'create') {
+
+    $created = MateriaModel::create([
+        'codigo' => $codigo,
+        'nombre' => $nombre,
+        'descripcion' => $descripcion,
+        'area' => $area,
+        'activa' => 1,
+    ]);
+
+    if ($created) {
+
+        try {
+
+            MateriaEventLogger::registrar([
                 'codigo' => $codigo,
                 'nombre' => $nombre,
                 'descripcion' => $descripcion,
                 'area' => $area,
-                'activa' => 1,
+                'resultado' => 'EXITOSO',
             ]);
 
-            if ($created) {
-                $_SESSION['flash_success'] = 'La materia fue creada correctamente.';
-            } else {
-                $_SESSION['flash_error'] = 'No se pudo crear la materia.';
-            }
+        } catch (Throwable $e) {
 
-            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-            header('Pragma: no-cache');
-            header('Expires: 0');
-            header('Location: ' . base_url('/materias'));
-            exit;
+            error_log(
+                'Error registrando evento crear_materia: '
+                . $e->getMessage()
+            );
         }
+
+        $_SESSION['flash_success'] =
+            'La materia fue creada correctamente.';
+
+    } else {
+
+        $_SESSION['flash_error'] =
+            'No se pudo crear la materia.';
+    }
+
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+
+    header('Location: ' . base_url('/materias'));
+    exit;
+}
+
+
 
         if ($id <= 0) {
             $_SESSION['flash_error'] = 'No se pudo identificar la materia.';

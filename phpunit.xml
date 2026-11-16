@@ -1,0 +1,17 @@
+
+<phpunit bootstrap="app/config/bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="RedTutor">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">app</directory>
+        </include>
+        <report>
+            <clover outputFile="coverage.xml"/>
+        </report>
+    </coverage>
+</phpunit>

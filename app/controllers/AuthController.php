@@ -9,6 +9,10 @@ class AuthController
 {
     public static function login()
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         $auth0 = self::getAuth0();
         $auth0->login();
     }
@@ -16,6 +20,10 @@ class AuthController
     public static function callback()
     {
         try {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
             $auth0 = self::getAuth0();
             $session = $auth0->getUser();
 
@@ -40,6 +48,11 @@ class AuthController
             }
 
             header('Location: ' . base_url('/dashboard'));
+            exit;
+        } catch (\Auth0\SDK\Exception\CoreException $e) {
+            self::resetAuthSession();
+            $_SESSION['auth_error'] = 'La sesión de autenticación expiró o es inválida. Intenta iniciar sesión nuevamente.';
+            header('Location: ' . base_url('/'));
             exit;
         } catch (Auth0Exception $e) {
             $_SESSION['auth_error'] = $e->getMessage();
@@ -111,10 +124,10 @@ class AuthController
 
     public static function logout()
     {
-        unset($_SESSION['auth0_user']);
-        unset($_SESSION['auth0_user_id']);
-        unset($_SESSION['auth0_user_email']);
-        session_destroy();
+        self::resetAuthSession();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+        }
 
         $domain = env('AUTH0_DOMAIN');
         $clientId = env('AUTH0_CLIENT_ID');
@@ -135,10 +148,21 @@ class AuthController
         exit;
     }
 
+    public static function resetAuthSession(): void
+    {
+        if (!isset($_SESSION)) {
+            return;
+        }
+
+        foreach (['auth0_user', 'auth0_user_id', 'auth0_user_email', 'auth0_user_role', 'auth0_user_roles', 'auth_error'] as $key) {
+            unset($_SESSION[$key]);
+        }
+    }
+
     private static function getAuth0()
     {
-        $redirectUri = env('AUTH0_REDIRECT_URI');
-        if (empty($redirectUri)) {
+        $redirectUri = trim((string) env('AUTH0_REDIRECT_URI', ''));
+        if ($redirectUri === '' || !preg_match('#/callback$#i', $redirectUri)) {
             $redirectUri = base_url('/callback');
         }
 

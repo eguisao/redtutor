@@ -13,7 +13,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>REDTUTOR | Usuarios Auth0</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f5f7f6; }
         .sidebar { min-height: 100vh; background: #fff; border-right: 1px solid #e5e7eb; padding: 1rem 1rem 2rem; }
@@ -106,6 +106,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                                         <?php foreach ($usuarios as $usuario): ?>
                                             <?php
                                                 $usuarioId = $usuario['user_id'] ?? '';
+                                                $modalId = hash('sha256', (string) $usuarioId . '|redtutor');
                                                 $name = $usuario['name'] ?? ($usuario['nickname'] ?? '-');
                                                 $email = $usuario['email'] ?? '-';
                                                 $createdAt = $usuario['created_at'] ?? null;
@@ -163,7 +164,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                                                                 </button>
                                                             <?php endif; ?>
                                                         </form>
-                                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editUserModal_<?php echo md5((string) $usuarioId); ?>">
+                                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editUserModal_<?php echo e($modalId); ?>">
                                                             Actualizar
                                                         </button>
 
@@ -172,7 +173,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                                                                 Eliminar
                                                             </button>
                                                         <?php else: ?>
-                                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal_<?php echo md5((string) $usuarioId); ?>">
+                                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal_<?php echo e($modalId); ?>">
                                                                 Eliminar
                                                             </button>
                                                         <?php endif; ?>
@@ -180,7 +181,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                                                 </td>
                                             </tr>
 
-                                            <div class="modal fade" id="deleteUserModal_<?php echo md5((string) $usuarioId); ?>" tabindex="-1" aria-hidden="true">
+                                            <div class="modal fade" id="deleteUserModal_<?php echo e($modalId); ?>" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content border-0 shadow-lg">
                                                         <div class="modal-header border-0 pb-0">
@@ -209,7 +210,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
                                                 </div>
                                             </div>
 
-                                            <div class="modal fade" id="editUserModal_<?php echo md5((string) $usuarioId); ?>" tabindex="-1" aria-hidden="true">
+                                            <div class="modal fade" id="editUserModal_<?php echo e($modalId); ?>" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-lg modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <form method="post" action="<?php echo base_url('/usuarios'); ?>" data-update-user-form="1">
@@ -302,8 +303,8 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const RELOAD_DELAY_MS = 10000;
